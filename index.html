@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Animations & LocalStorage</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .action-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            transition: transform 0.3s ease, background-color 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-button:hover {
+            transform: scale(1.1);
+            background-color: #2980b9;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        .color-options {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <button class="action-button" id="actionButton">Click Me!</button>
+    <div class="color-options">
+        <button class="color-btn" style="background-color: #3498db;" data-color="#3498db"></button>
+        <button class="color-btn" style="background-color: #e74c3c;" data-color="#e74c3c"></button>
+        <button class="color-btn" style="background-color: #2ecc71;" data-color="#2ecc71"></button>
+    </div>
+
+    <script>
+        const preferences = {
+            saveColor(color) {
+                localStorage.setItem('buttonColor', color);
+            },
+
+            loadColor() {
+                return localStorage.getItem('buttonColor') || '#3498db';
+            },
+
+            applyColor(button, color) {
+                button.style.backgroundColor = color;
+            },
+
+            triggerAnimation(button) {
+                button.classList.add('pulse');
+                setTimeout(() => {
+                    button.classList.remove('pulse');
+                }, 500);
+            }
+        };
+
+        const actionButton = document.getElementById('actionButton');
+        const colorButtons = document.querySelectorAll('.color-btn');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedColor = preferences.loadColor();
+            preferences.applyColor(actionButton, savedColor);
+        });
+
+        actionButton.addEventListener('click', () => {
+            preferences.triggerAnimation(actionButton);
+        });
+
+        colorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const selectedColor = button.getAttribute('data-color');
+                preferences.saveColor(selectedColor);
+                preferences.applyColor(actionButton, selectedColor);
+                preferences.triggerAnimation(actionButton);
+            });
+        });
+    </script>
+</body>
+</html>
